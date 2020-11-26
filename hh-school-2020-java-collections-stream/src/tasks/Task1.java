@@ -4,9 +4,7 @@ import common.Person;
 import common.PersonService;
 import common.Task;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /*
@@ -21,7 +19,10 @@ public class Task1 implements Task {
   // !!! Редактируйте этот метод !!!
   private List<Person> findOrderedPersons(List<Integer> personIds) {
     Set<Person> persons = PersonService.findPersons(personIds);
-    return Collections.emptyList();
+    return persons.stream()
+            //O(n^2) (взятие по элементу индекса за O(n) для каждой персоны + сортирвка = n^2 + nlogn = n^2)
+            .sorted(Comparator.comparingInt(person -> personIds.indexOf(person.getId())))
+            .collect(Collectors.toList());
   }
 
   @Override
