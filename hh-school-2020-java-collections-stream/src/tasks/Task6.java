@@ -5,12 +5,9 @@ import common.Person;
 import common.Task;
 
 import java.time.Instant;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /*
 Имеются
@@ -25,10 +22,16 @@ public class Task6 implements Task {
                                             Map<Integer, Set<Integer>> personAreaIds,
                                             Collection<Area> areas) {
 
-    return persons.stream().flatMap(person -> areas.stream()
-            .filter(area -> personAreaIds.get(person.getId()).contains(area.getId()))
-            .map(area -> person.getFirstName() + " - " + area.getName()))
-            .collect(Collectors.toSet());
+      Map<Integer, String> idAreaToNameAreaMap = areas.stream().collect(Collectors.toMap(Area::getId, Area::getName));
+
+      Map<Integer, Set<String>> idPersonToNameAreas = personAreaIds.entrySet().stream()
+              .collect(Collectors.toMap((Map.Entry::getKey),
+                      (y -> y.getValue().stream()
+                              .map(idAreaToNameAreaMap::get)
+                              .collect(Collectors.toSet()))));
+
+      return persons.stream().flatMap(p -> idPersonToNameAreas.get(p.getId()).stream()
+              .map(x -> p.getFirstName() + " - " + x)).collect(Collectors.toSet());
   }
 
   @Override

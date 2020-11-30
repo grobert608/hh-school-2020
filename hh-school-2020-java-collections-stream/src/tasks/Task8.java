@@ -3,12 +3,7 @@ package tasks;
 import common.Person;
 import common.Task;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -63,17 +58,11 @@ public class Task8 implements Task {
 //    }
 //    return result;
 
-
-    // Для большой конкатинации строк лучше использовать StringBuilder, чем неизменемый стринг
-    // Если хотим быстрее, но не потокобезопасно, то StringBuilder лучше использовать
-
     // Было некорретно составлен резултат, не было отчества
 
-    // Имя всегда иницаилизированно, так что нпэ не будет
-    StringBuffer personName = new StringBuffer(person.getFirstName());
-    if (person.getSecondName() != null) personName.append(" ").append(person.getSecondName());
-    if (person.getMiddleName() != null) personName.append(" ").append(person.getMiddleName());
-    return personName.toString();
+    // Классно выглядит!
+    return Stream.of(person.getFirstName(), person.getSecondName(), person.getMiddleName())
+            .filter(Objects::nonNull).collect(Collectors.joining(" "));
   }
 
   // словарь id персоны -> ее имя
@@ -87,7 +76,7 @@ public class Task8 implements Task {
 //    return map;
 
     // лучше использовать стрим + коллект
-    return persons.stream().collect(Collectors.toMap(Person::getId, Person::getFirstName));
+    return persons.stream().collect(Collectors.toMap(Person::getId, this::convertPersonToString));
   }
 
   // есть ли совпадающие в двух коллекциях персоны?
@@ -102,8 +91,8 @@ public class Task8 implements Task {
 //    }
 //    return has;
 
-    // лучше использовать стрим + anyMatch
-    return persons1.stream().anyMatch(persons2::contains);
+    // лучше использовать disjoint
+    return !Collections.disjoint(persons1, persons2);
   }
 
   //...
