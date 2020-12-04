@@ -29,9 +29,7 @@ public class Task8 implements Task {
 //    return persons.stream().map(Person::getFirstName).collect(Collectors.toList());
 
     // isEmpty() более предпочтительный вариант, лучше скипать в потоке
-    return (persons.isEmpty()) ?
-            Collections.emptyList() :
-            persons.stream().skip(1).map(Person::getFirstName).collect(Collectors.toList());
+    return persons.stream().skip(1).map(Person::getFirstName).collect(Collectors.toList());
   }
 
   //ну и различные имена тоже хочется
@@ -39,7 +37,7 @@ public class Task8 implements Task {
 //    return getNames(persons).stream().distinct().collect(Collectors.toSet());
 
     // был какой-то оверинжениринг, стримы тут не нужны, дистинкт тоже, так как и так к сету приводим
-    return Set.copyOf(getNames(persons));
+    return new HashSet<>(getNames(persons));
   }
 
   //Для фронтов выдадим полное имя, а то сами не могут
@@ -76,7 +74,7 @@ public class Task8 implements Task {
 //    return map;
 
     // лучше использовать стрим + коллект
-    return persons.stream().collect(Collectors.toMap(Person::getId, this::convertPersonToString));
+    return persons.stream().collect(Collectors.toMap(Person::getId, this::convertPersonToString, (presentName, newName) -> presentName));
   }
 
   // есть ли совпадающие в двух коллекциях персоны?
@@ -91,8 +89,7 @@ public class Task8 implements Task {
 //    }
 //    return has;
 
-    // лучше использовать disjoint
-    return !Collections.disjoint(persons1, persons2);
+    return persons1.stream().anyMatch(new HashSet<>(persons2)::contains);
   }
 
   //...

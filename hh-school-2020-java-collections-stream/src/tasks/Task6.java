@@ -24,14 +24,8 @@ public class Task6 implements Task {
 
       Map<Integer, String> idAreaToNameAreaMap = areas.stream().collect(Collectors.toMap(Area::getId, Area::getName));
 
-      Map<Integer, Set<String>> idPersonToNameAreas = personAreaIds.entrySet().stream()
-              .collect(Collectors.toMap((Map.Entry::getKey),
-                      (y -> y.getValue().stream()
-                              .map(idAreaToNameAreaMap::get)
-                              .collect(Collectors.toSet()))));
-
-      return persons.stream().flatMap(p -> idPersonToNameAreas.get(p.getId()).stream()
-              .map(x -> p.getFirstName() + " - " + x)).collect(Collectors.toSet());
+      return persons.stream().flatMap(person -> personAreaIds.get(person.getId()).stream()
+              .map(idArea -> person.getFirstName() + " - " + idAreaToNameAreaMap.get(idArea))).collect(Collectors.toSet());
   }
 
   @Override
