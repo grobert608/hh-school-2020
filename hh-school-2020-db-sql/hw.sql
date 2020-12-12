@@ -101,19 +101,20 @@ SELECT
              ELSE compensation_from / 0.87
         END) AS avg_of_min_salary,
     AVG(CASE WHEN compensation_gross IS TRUE
-             THEN compensation_to + compensation_from
+             THEN (compensation_to + compensation_from) / 2
              ELSE ((compensation_to + compensation_from) / 2) / 0.87
         END) AS avg_of_mean_salary
 FROM vacancy;
 
 -- Task5
 WITH max_count_of_each_respond AS (
-    SELECT DISTINCT hirer_name,
-                    max(count(respond.vacancy_id <> 0)) OVER (PARTITION BY hirer_name) as count
+    SELECT hirer.hirer_id,
+           hirer_name,
+           max(count(respond.vacancy_id <> 0)) OVER (PARTITION BY hirer_name) as count
     FROM hirer
-    RIGHT JOIN vacancy ON vacancy.hirer_id = hirer.hirer_id
-    RIGHT JOIN respond ON respond.vacancy_id = vacancy.vacancy_id
-    GROUP BY hirer_name, respond.vacancy_id
+    LEFT JOIN vacancy ON vacancy.hirer_id = hirer.hirer_id
+    LEFT JOIN respond ON respond.vacancy_id = vacancy.vacancy_id
+    GROUP BY hirer.hirer_id
 )
 SELECT hirer_name
 FROM max_count_of_each_respond
@@ -133,10 +134,17 @@ SELECT
 FROM count_of_vacancies;
 
 -- Task7
-SELECT hirer.area_id,
-       max(respond.time_apply - vacancy.time_apply) AS max_time,
-       min(respond.time_apply - vacancy.time_apply) AS min_time
-FROM vacancy
-INNER JOIN respond ON respond.vacancy_id = vacancy.vacancy_id
-INNER JOIN hirer ON hirer.hirer_id = vacancy.hirer_id
-GROUP BY hirer.area_id;
+WITH first_respond AS (
+    SELECT area_id,
+           vacancy.vacancy_id,
+           min(respond.time_apply - vacancy.time_apply) AS time_from_respond
+    FROM vacancy
+    INNER JOIN respond ON vacancy.vacancy_id = respond.vacancy_id
+    INNER JOIN hirer ON vacancy.hirer_id = hirer.hirer_id
+    GROUP BY vacancy.vacancy_id, area_id
+)
+SELECT area_id,
+       min(time_from_respond),
+       max(time_from_respond)
+FROM first_respond
+GROUP BY area_id;
