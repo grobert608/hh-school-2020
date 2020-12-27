@@ -1,6 +1,6 @@
-package task1.utilsForTask;
+package task1.messages;
 
-public class VacancyArchivationMessage {
+public class VacancyArchivationMessage implements Message{
     public VacancyArchivationMessage() {
         System.out.println("Create VacancyArchivationMessage");
     }

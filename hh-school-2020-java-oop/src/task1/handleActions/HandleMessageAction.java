@@ -1,10 +1,10 @@
 package task1.handleActions;
 
-import task1.utilsForTask.VacancyCreationMessage;
+import task1.messages.Message;
 
 @FunctionalInterface
 public interface HandleMessageAction {
 
-    public void handleMessage(VacancyCreationMessage message);
+    public void handleMessage(Message message);
 }
 
