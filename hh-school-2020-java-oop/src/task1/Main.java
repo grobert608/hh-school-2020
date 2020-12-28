@@ -1,7 +1,8 @@
 package task1;
 
-import task1.handleActions.HandleMessageActionDBImpl;
-import task1.handleActions.HandleMessageActionLoggerImpl;
+import task1.actionProcessing.HandleMessageActionDBImpl;
+import task1.actionProcessing.HandleMessageActionLoggerImpl;
+import task1.handleActions.SendMessageOnVacancyCreation;
 import task1.listeners.MessageListener;
 import task1.factory.ListenerFactory;
 import task1.messages.VacancyArchivationMessage;
@@ -14,12 +15,14 @@ public class Main {
         MessageListener.getSubscriber().setListenerFactory(listenerFactory)
                 .setName("vacancy_creation")
                 .setVacancyArchivationMessage(VacancyCreationMessage.class)
-                .subscribeOnHandleMessageAction(new HandleMessageActionLoggerImpl())
-                .subscribeOnHandleMessageAction(new HandleMessageActionDBImpl());
+                .addActionProcessing(new HandleMessageActionLoggerImpl())
+                .addActionProcessing(new HandleMessageActionDBImpl())
+                .subscribeOnHandleMessageAction(new SendMessageOnVacancyCreation());
 
         MessageListener.getSubscriber().setListenerFactory(listenerFactory)
                 .setName("vacancy_archivation")
                 .setVacancyArchivationMessage(VacancyArchivationMessage.class)
-                .subscribeOnHandleMessageAction(new HandleMessageActionLoggerImpl());
+                .addActionProcessing(new HandleMessageActionLoggerImpl())
+                .subscribeOnHandleMessageAction(new SendMessageOnVacancyCreation());
     }
 }
